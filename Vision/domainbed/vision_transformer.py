@@ -43,8 +43,8 @@ from timm.models.registry import register_model
 
 if float(torch.version.cuda) > 10.1:
     # tutel only works above cuda 10.1
-    from tutel import moe as tutel_moe
-from tutel.impls.moe_layer_mass import moe_layer_mass
+    from tutel.tutel import moe as tutel_moe
+from tutel.tutel.impls.moe_layer_mass import moe_layer_mass
 
 _logger = logging.getLogger(__name__)
 import warnings

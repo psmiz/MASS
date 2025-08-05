@@ -7,8 +7,8 @@ from datasets import load_dataset
 import numpy as np
 import time
 import turtle
-from tutel import moe as tutel_moe
-from tutel.impls.moe_layer_mass import moe_layer_mass
+from tutel.tutel import moe as tutel_moe
+from tutel.tutel.impls.moe_layer_mass import moe_layer_mass
 import math
 
 from k_means_constrained import KMeansConstrained
