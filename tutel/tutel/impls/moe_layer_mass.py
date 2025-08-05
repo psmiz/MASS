@@ -158,8 +158,6 @@ class MoELayerMASS(MOELayer):
                 gate = self.gates[0]
                 if hasattr(gate, 'wg'):
                     gate.wg.weight[target_expert_idx].copy_(gate.wg.weight[source_expert_idx])
-                elif hasattr(gate, 'sim_matrix'):
-                    gate.sim_matrix[:, target_expert_idx].copy_(gate.sim_matrix[:, source_expert_idx])
                 gate.experts_mask[target_expert_idx] = 1.0
         
         except Exception as e:
@@ -175,40 +173,26 @@ class MoELayerMASS(MOELayer):
                 return
 
             with torch.no_grad():
+                # Gradient Decomposition for Expert
                 w = self.experts.batched_fc1_w[source_expert_idx].detach()
                 g_old = self.experts.batched_fc1_w.grad[source_expert_idx].detach()
                 
-                # w, g_old: [hidden_size, model_dim] (out_features, in_features)
-                
-                # dot_product = torch.sum(g_old * w, dim=0)
-                # w_norm_sq = torch.sum(w * w, dim=0) + 1e-12
-                # proj_g = (dot_product.unsqueeze(0) / w_norm_sq.unsqueeze(0)) * w
-
                 dot_product = torch.sum(g_old * w, dim=1) 
-                w_norm_sq = torch.sum(w * w, dim=1) + 1e-12 
-                proj_g = (dot_product.unsqueeze(1) / w_norm_sq.unsqueeze(1)) * w  # shape: [hidden_size, model_dim]
+                w_norm = torch.sum(w * w, dim=1) + 1e-12 
+                proj_g = (dot_product.unsqueeze(1) / w_norm.unsqueeze(1)) * w  # shape: [hidden_size, model_dim]
 
                 self.experts.batched_fc1_w.grad[source_expert_idx] = proj_g
                 if new_expert_idx < self.experts.batched_fc1_w.grad.size(0):
                     self.experts.batched_fc1_w.grad[new_expert_idx] = g_old.clone()
 
+                # Gradient Decomposition for Gate
                 gate = self.gates[0]
                 if hasattr(gate, 'wg') and gate.wg.weight.grad is not None:
                     wg = gate.wg.weight[source_expert_idx].detach()
                     gg_old = gate.wg.weight.grad[source_expert_idx].detach()
-                    dot_product = torch.dot(gg_old, wg)
-                    wg_norm_sq = torch.dot(wg, wg) + 1e-12
-                    proj_gg = (dot_product / wg_norm_sq) * wg
+                    proj_gg = (torch.dot(gg_old, wg) / (torch.dot(wg, wg) + 1e-12)) * wg
                     gate.wg.weight.grad[source_expert_idx] = proj_gg
                     gate.wg.weight.grad[new_expert_idx] = gg_old.clone()
-                elif hasattr(gate, 'sim_matrix') and gate.sim_matrix.grad is not None:
-                    sim = gate.sim_matrix[:, source_expert_idx].detach()
-                    sim_grad_old = gate.sim_matrix.grad[:, source_expert_idx].detach()
-                    dot_product = torch.dot(sim_grad_old, sim)
-                    sim_norm_sq = torch.dot(sim, sim) + 1e-12
-                    proj_sim_grad = (dot_product / sim_norm_sq) * sim
-                    gate.sim_matrix.grad[:, source_expert_idx] = proj_sim_grad
-                    gate.sim_matrix.grad[:, new_expert_idx] = sim_grad_old.clone()
 
         except Exception as e:
             print(f"MASS: Error in gradient alignment: {e}")
@@ -219,7 +203,7 @@ class MoELayerMASS(MOELayer):
         self.grad_window.append(deque(maxlen=self.window_size))
         self.z_window.append(deque(maxlen=self.window_size))
             
-    def _redundancy_regularization1(self):
+    def _redundancy_regularization(self):
         """
         Compute redundancy regularization term to encourage expert divergence.
         Based on the MASS AutoK implementation.
@@ -233,57 +217,13 @@ class MoELayerMASS(MOELayer):
             if hasattr(gate, 'wg'):
                 w1 = F.normalize(gate.wg.weight[source_idx], dim=0)
                 w2 = F.normalize(gate.wg.weight[target_idx], dim=0)
-            elif hasattr(gate, 'sim_matrix'):
-                w1 = F.normalize(gate.sim_matrix[:, source_idx], dim=0)
-                w2 = F.normalize(gate.sim_matrix[:, target_idx], dim=0)
-            else:
-                continue
             similarity = torch.dot(w1, w2)
             redundancy += similarity ** 2
         
         return redundancy
 
-    def _redundancy_regularization2(self):
-        """
-        Compute redundancy regularization term to encourage expert divergence.
-        Based on the MASS AutoK implementation.
-        """
-        if not self.duplicated_pairs:
-            return torch.tensor(0.0, device=self.experts.batched_fc1_w.device)
-        try:
-            gate = self.gates[0]
-            if not hasattr(gate, 'wg') or not hasattr(gate.wg, 'weight'):
-                return torch.tensor(0.0, device=self.experts.batched_fc1_w.device)
-            
-            W_list = []
-            for source_idx, target_idx in self.duplicated_pairs:
-                if source_idx < gate.wg.weight.size(0):
-                    W_list.append(gate.wg.weight[source_idx].view(1, -1))
-                if target_idx < gate.wg.weight.size(0):
-                    W_list.append(gate.wg.weight[target_idx].view(1, -1))
-            
-            W = F.normalize(torch.cat(W_list, dim=0), dim=1)
-            I = torch.eye(W.size(0), device=W.device)
-            redundancy = torch.norm(torch.matmul(W, W.T) - I, p='fro')
-            return redundancy
-            
-        except Exception as e:
-            print(f"MASS: Error computing redundancy regularization: {e}")
-            return torch.tensor(0.0, device=self.experts.batched_fc1_w.device)
-    
-    def _redundancy_regularization3(self):
-        gate = self.gates[0]
-        if not hasattr(gate, 'wg') or not hasattr(gate.wg, 'weight'):
-            return torch.tensor(0.0, device=self.experts.batched_fc1_w.device)
-        
-        W = gate.wg.weight[:self.num_global_experts]  # Shape: [num_active_experts, gate_dim]
-        W = F.normalize(W, dim=1)
-        I = torch.eye(W.size(0), device=W.device)
-        redundancy = torch.norm(torch.matmul(W, W.T) - I, p='fro')
-        return redundancy
-
     def get_redundancy_loss(self):
-        return self._redundancy_regularization1()
+        return self._redundancy_regularization()
         
     def get_mass_info(self):
         """Return MASS statistics and state"""

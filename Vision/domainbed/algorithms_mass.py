@@ -422,10 +422,8 @@ class GMOE(Algorithm):
                 if info:
                     last_expert_idx = moe_layer.num_global_experts - 1
                     if moe_layer.expansion_count > 0:
-                        # Check if expansion actually helps
                         with torch.no_grad():
                             moe_layer.gates[0].experts_mask[last_expert_idx] = 0.0
-                            # Re-run forward pass to compute masked loss
                             if self.hparams.get('vit_type', 'small') == 'large':
                                 with autocast():
                                     masked_loss = F.cross_entropy(self.predict(all_x), all_y)
