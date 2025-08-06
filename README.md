@@ -48,11 +48,16 @@ This repository contains the implementation of **MASS (Mixture-of-Experts for Ad
 git clone <repository-url>
 cd mass
 
+# Create conda environment from environment.yml
+conda env create -f environment.yml
+conda activate mass
+
 # Install Tutel library with MASS extensions
 cd tutel
 python setup.py clean --all
 pip install -e .
 ```
+
 
 ### Install Dependencies
 
