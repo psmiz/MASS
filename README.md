@@ -75,7 +75,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🎯 Language Tasks (GLUE Benchmarks)
+## Language Tasks (GLUE Benchmarks)
 
 ### Supported Tasks
 - **MNLI** (Multi-Genre Natural Language Inference)
@@ -105,7 +105,7 @@ bash Language/scripts_mass/mrpc.sh
 
 ---
 
-## 👁️ Vision Tasks (Domain Generalization)
+## Vision Tasks (Domain Generalization)
 
 ### Supported Datasets
 - **PACS** (Photo, Art, Cartoon, Sketch)
