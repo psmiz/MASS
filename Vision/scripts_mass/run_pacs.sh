@@ -24,7 +24,7 @@ for SEED in "${SEEDS[@]}"; do
             --device $DEVICE \
             --enable_mass \
             --mass_p_threshold 0.01 \
-            --mass_similarity_threshold 0.002 \
+            --mass_similarity_threshold 0.001 \
             --mass_expansion_patience 3 \
             --mass_redundancy_weight 0.01 > $OUTPUT_DIR/logs/pacs_seed${SEED}_env${ENV}.log 2>&1 &
     done
