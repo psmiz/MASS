@@ -7,8 +7,8 @@ from datasets import load_dataset
 import numpy as np
 import time
 import turtle
-from tutel.tutel import moe as tutel_moe
-from tutel.tutel.impls.moe_layer_mass import moe_layer_mass
+from tutel import moe as tutel_moe
+from tutel.impls.moe_layer_mass import moe_layer_mass
 import math
 
 from k_means_constrained import KMeansConstrained
@@ -68,6 +68,14 @@ def vit_to_MoE(args, model:ViTForImageClassification):
                         one_score_gate=args.one_score_gate,
                         normalize_one_score_gate=args.normalize_one_score_gate,
                         update_momentum=args.one_score_gate_update_momentum,
+                        mass_config={
+                                'enable_mass': getattr(args, 'enable_mass', False),
+                                'warmup_steps': getattr(args, 'mass_warmup_steps', 50),
+                                'window_size': getattr(args, 'mass_window_size', 200),
+                                'p_threshold': getattr(args, 'mass_p_threshold', 0.01),
+                                'similarity_threshold': getattr(args, 'mass_similarity_threshold', 0.001),
+                                'expansion_patience': getattr(args, 'mass_expansion_patience', 3),
+                            }
                         )
                 else:
                     layer_module.mlp = tutel_moe.moe_layer(
@@ -198,6 +206,14 @@ def vit_to_MoE(args, model:ViTForImageClassification):
                         one_score_gate=args.one_score_gate,
                         normalize_one_score_gate=args.normalize_one_score_gate,
                         update_momentum=args.one_score_gate_update_momentum,
+                        mass_config={
+                                'enable_mass': getattr(args, 'enable_mass', False),
+                                'warmup_steps': getattr(args, 'mass_warmup_steps', 50),
+                                'window_size': getattr(args, 'mass_window_size', 200),
+                                'p_threshold': getattr(args, 'mass_p_threshold', 0.01),
+                                'similarity_threshold': getattr(args, 'mass_similarity_threshold', 0.001),
+                                'expansion_patience': getattr(args, 'mass_expansion_patience', 3),
+                            }
                         )
                 else:
                     layer_module.mlp = tutel_moe.moe_layer(

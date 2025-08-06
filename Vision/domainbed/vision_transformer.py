@@ -43,8 +43,8 @@ from timm.models.registry import register_model
 
 if float(torch.version.cuda) > 10.1:
     # tutel only works above cuda 10.1
-    from tutel.tutel import moe as tutel_moe
-from tutel.tutel.impls.moe_layer_mass import moe_layer_mass
+    from tutel import moe as tutel_moe
+from tutel.impls.moe_layer_mass import moe_layer_mass
 
 _logger = logging.getLogger(__name__)
 import warnings
@@ -309,6 +309,14 @@ class Block(nn.Module):
                     one_score_gate=kwargs.get('one_score_gate', False),
                     normalize_one_score_gate=kwargs.get('normalize_one_score_gate', False),
                     update_momentum=kwargs.get('one_score_gate_update_momentum', 0.0),
+                    mass_config={
+                            'enable_mass': kwargs.get('enable_mass', False),
+                            'warmup_steps': kwargs.get('mass_warmup_steps', 50),
+                            'window_size': kwargs.get('mass_window_size', 200),
+                            'p_threshold': kwargs.get('mass_p_threshold', 0.01),
+                            'similarity_threshold': kwargs.get('mass_similarity_threshold', 0.001),
+                            'expansion_patience': kwargs.get('mass_expansion_patience', 3),
+                        }
                 )
             else:
                 self.mlp = tutel_moe.moe_layer(

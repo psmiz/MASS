@@ -14,7 +14,7 @@ mkdir -p $OUTPUT_DIR/logs
 for SEED in "${SEEDS[@]}"; do
     for ENV in "${ENVS[@]}"; do
         python3 -m domainbed.scripts.train_mass \
-            --data_dir=/data \
+            --data_dir=/domainbed/data \
             --dataset TerraIncognita \
             --seed $SEED \
             --test_envs $ENV \
@@ -22,11 +22,11 @@ for SEED in "${SEEDS[@]}"; do
             --rm_threshold 0.30 \
             --algorithm GMOE \
             --hparams '{"vanilla_ViT":false, "vit_type":"small", "router": "mintau", "adaptive_experts":true, "max_expert_num": 8}' \
-            --output_dir ${OUTPUT_DIR} \
+            --output_dir $OUTPUT_DIR \
             --device $DEVICE \
             --enable_mass \
             --mass_p_threshold 0.01 \
-            --mass_similarity_threshold 0.001 \
+            --mass_similarity_threshold 0.002 \
             --mass_expansion_patience 3 \
             --mass_redundancy_weight 0.01
     done

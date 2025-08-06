@@ -311,7 +311,6 @@ def main(args, seed=0, lr=3e-5):
                 best_eval_metric = json.load(f)
 
                 final_K, final_avg_k = 0, 0
-                temp_dir = str.replace(output_dir, './results', '/home/user/psm/NIPS_2025/EMoE/results')
                 files = os.listdir(output_dir)
                 for file in files:
                     if 'Final_K' in file:
@@ -766,7 +765,7 @@ def main(args, seed=0, lr=3e-5):
                     redundancy_loss = torch.tensor(0.0, device=task_loss.device)
                     # Add MASS redundancy regularization loss
                     if hasattr(args, 'mass_redundancy_weight') and args.mass_redundancy_weight > 0:
-                        import pdb; pdb.set_trace()
+                        # import pdb; pdb.set_trace()
                         if 'bert' in args.model_name_or_path:
                             for i, layer in enumerate(layers):
                                 if i in args.moe_layers and hasattr(layer.mlp, 'get_redundancy_loss'):
@@ -877,12 +876,10 @@ def main(args, seed=0, lr=3e-5):
             no_improvement = 0
             if args.save_model:
                 unwrapped_model = accelerator.unwrap_model(model)
-                # best model save no
-                # model_dir = output_dir.replace('./results', '/mnt/data0/psm/NIPS_2025/dynmoe/EMoE/results')
-                # model_dir = output_dir
-                # os.makedirs(model_dir, exist_ok=True)
-                # torch.save(unwrapped_model.state_dict(), os.path.join(model_dir, "best_model_ckpt.pth"))
-                # torch.save(tokenizer, os.path.join(model_dir, "tokenizer.pth"))
+                model_dir = output_dir
+                os.makedirs(model_dir, exist_ok=True)
+                torch.save(unwrapped_model.state_dict(), os.path.join(model_dir, "best_model_ckpt.pth"))
+                torch.save(tokenizer, os.path.join(model_dir, "tokenizer.pth"))
         else:
             no_improvement += 1
         

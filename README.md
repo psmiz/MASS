@@ -51,7 +51,7 @@ cd mass
 # Install Tutel library with MASS extensions
 cd tutel
 python setup.py clean --all
-python setup.py install
+pip install -e .
 ```
 
 ### Install Dependencies
@@ -60,14 +60,12 @@ python setup.py install
 ```bash
 cd Language
 pip install -r requirements.txt
-# Key packages: transformers==4.31.0, datasets, evaluate, accelerate, peft
 ```
 
 **For Vision Tasks:**
 ```bash
 cd Vision
 pip install -r requirements.txt
-# Key packages: timm, k_means_constrained, gdown
 ```
 
 ---
@@ -84,16 +82,20 @@ pip install -r requirements.txt
 ### Quick Start
 
 ```bash
-cd Language
-
-# Run MNLI with MASS
-bash scripts_mass/mnli.sh
-
 # Run CoLA with MASS
-bash scripts_mass/cola.sh
+bash Language/scripts_mass/cola.sh
 
 # Run RTE with MASS
-bash scripts_mass/rte.sh
+bash Language/scripts_mass/rte.sh
+
+# Run MNLI with MASS
+bash Language/scripts_mass/mnli.sh
+
+# Run QNLI with MASS
+bash Language/scripts_mass/qnli.sh
+
+# Run MRPC with MASS
+bash Language/scripts_mass/mrpc.sh
 ```
 
 ---
@@ -106,13 +108,16 @@ bash scripts_mass/rte.sh
 - **OfficeHome** (Art, Clipart, Product, Real)
 - **TerraIncognita** (Location-based terrain classification)
 
-### Quick Start
+### Datasets
+```bash
+python3 -m domainbed.scripts.download \
+       --data_dir=./domainbed/data
+```
+
+### Quick Start for Training
 
 ```bash
 cd Vision
-
-# Prepare data directory
-export DATA_DIR=/path/to/your/data
 
 # Run PACS with MASS
 bash scripts_mass/run_pacs.sh
@@ -126,6 +131,13 @@ bash scripts_mass/run_office.sh
 # Run TerraIncognita with MASS
 bash scripts_mass/run_terra.sh
 ```
+
+### Evaluation
+
+```bash
+python3 -m domainbed.scripts.collect_results --input_dir=${output_dir}
+```
+
 ---
 
 <!-- **Happy experimenting with MASS! 🚀**  -->

@@ -20,13 +20,11 @@ class MoELayerMASS(MOELayer):
         # MASS configuration with defaults
         self.t_warmup = self.mass_config.get('warmup_steps', 50)
         self.window_size = self.mass_config.get('window_size', 200)
-        self.p_limit = self.mass_config.get('p_threshold', 0.1)
-        self.sim_thresh = self.mass_config.get('similarity_threshold', 0.01)
+        self.p_limit = self.mass_config.get('p_threshold', 0.01)
+        self.sim_thresh = self.mass_config.get('similarity_threshold', 0.001)
         self.expansion_patience = self.mass_config.get('expansion_patience', 3)
         self.enable_mass = self.mass_config.get('enable_mass', True)
-        self.rm_threshold = self.mass_config.get('rm_threshold', 1.0)
-        self.route_scale = self.mass_config.get('route_scale', 1.0)
-        
+
         # MASS tracking state
         self.stop_expansion = False
         self.duplicated_pairs = []

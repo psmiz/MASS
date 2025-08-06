@@ -1,5 +1,7 @@
 gdown==4.2.0
-numpy>=1.22
+numpy==1.24.3
+timm
+wilds
 Pillow==9.0.1
 prettytable==2.1.0
 sconf==0.2.3

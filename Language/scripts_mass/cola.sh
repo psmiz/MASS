@@ -2,7 +2,7 @@
 set -x
 source consts.sh
 
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=1
 
 MOE_LAYERS_LIST=("10")
 TASK_NAME=cola
@@ -22,7 +22,7 @@ for MOE_LAYERS in ${MOE_LAYERS_LIST[@]}; do
         output_dir=logs/${TASK_NAME}/${MODEL_NAME}/${GATE}/moe_${NUM_EXPERTS}_experts_adaptive_topk_layers${MOE_LAYERS_NAME}_repeat${REPEAT}/${TIME}
         mkdir -p $output_dir
 
-        nohup python Language/search_glue_no_trainer_mass.py \
+        python Language/search_glue_no_trainer_mass.py \
             --model_name_or_path $MODEL_NAME \
             --to_MoE \
             --enable_mass \
@@ -43,7 +43,8 @@ for MOE_LAYERS in ${MOE_LAYERS_LIST[@]}; do
             --mass_expansion_patience 3 \
             --mass_redundancy_weight 0.01 \
             --random_cluster \
-            --save_model > $output_dir/train_nohup.out 2>&1 &
+            --save_model 
+            # > $output_dir/train_nohup.out 2>&1 &
         # wait
     done
 done

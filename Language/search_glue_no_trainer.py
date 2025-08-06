@@ -841,10 +841,7 @@ def main(args, seed=0, lr=3e-5):
             no_improvement = 0
             if args.save_model:
                 unwrapped_model = accelerator.unwrap_model(model)
-                # best model save no
-                # import pdb;pdb.set_trace()
-                model_dir = output_dir.replace('./results', '/mnt/data0/psm/NIPS_2025/dynmoe/EMoE/results')
-                # model_dir = output_dir
+                model_dir = output_dir
                 os.makedirs(model_dir, exist_ok=True)
                 torch.save(unwrapped_model.state_dict(), os.path.join(model_dir, "best_model_ckpt.pth"))
                 torch.save(tokenizer, os.path.join(model_dir, "tokenizer.pth"))

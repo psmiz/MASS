@@ -12,8 +12,8 @@ mkdir -p $OUTPUT_DIR/logs
 
 for SEED in "${SEEDS[@]}"; do
     for ENV in "${ENVS[@]}"; do
-        python3 -m domainbed.scripts.train_mass \
-            --data_dir=/data \
+        nohup python3 -m domainbed.scripts.train_mass \
+            --data_dir=/domainbed/data \
             --dataset PACS \
             --seed $SEED \
             --test_envs $ENV \
@@ -24,8 +24,8 @@ for SEED in "${SEEDS[@]}"; do
             --device $DEVICE \
             --enable_mass \
             --mass_p_threshold 0.01 \
-            --mass_similarity_threshold 0.001 \
+            --mass_similarity_threshold 0.002 \
             --mass_expansion_patience 3 \
-            --mass_redundancy_weight 0.01 
+            --mass_redundancy_weight 0.01 > $OUTPUT_DIR/logs/pacs_seed${SEED}_env${ENV}.log 2>&1 &
     done
 done

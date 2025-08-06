@@ -8,7 +8,7 @@ from transformers import BertForSequenceClassification, GPT2ForSequenceClassific
 import numpy as np
 import time
 import turtle
-from tutel.tutel.impls.moe_layer_mass import moe_layer_mass
+from tutel.impls.moe_layer_mass import moe_layer_mass
 import math
 
 from k_means_constrained import KMeansConstrained
@@ -81,6 +81,14 @@ def bert_to_MoE(args, model:BertForSequenceClassification, init=False):
                         one_score_gate=args.one_score,
                         normalize_one_score_gate=args.normalize_one_score_gate,
                         update_momentum=args.one_score_gate_update_momentum,
+                        mass_config={
+                                'enable_mass': getattr(args, 'enable_mass', False),
+                                'warmup_steps': getattr(args, 'mass_warmup_steps', 50),
+                                'window_size': getattr(args, 'mass_window_size', 200),
+                                'p_threshold': getattr(args, 'mass_p_threshold', 0.1),
+                                'similarity_threshold': getattr(args, 'mass_similarity_threshold', 0.01),
+                                'expansion_patience': getattr(args, 'mass_expansion_patience', 3),
+                            }
                     )
                 continue
             w_shape = weight_0.shape
@@ -167,16 +175,16 @@ def bert_to_MoE(args, model:BertForSequenceClassification, init=False):
                     one_score_gate=args.one_score,
                     normalize_one_score_gate=args.normalize_one_score_gate,
                     update_momentum=args.one_score_gate_update_momentum,
-                mass_config={
-                    'enable_mass': getattr(args, 'enable_mass', False),
-                    'warmup_steps': getattr(args, 'mass_warmup_steps', 50),
-                    'window_size': getattr(args, 'mass_window_size', 200),
-                    'p_threshold': getattr(args, 'mass_p_threshold', 0.1),
-                    'similarity_threshold': getattr(args, 'mass_similarity_threshold', 0.01),
-                    'expansion_patience': getattr(args, 'mass_expansion_patience', 3),
-                }
+                    mass_config={
+                        'enable_mass': getattr(args, 'enable_mass', False),
+                        'warmup_steps': getattr(args, 'mass_warmup_steps', 50),
+                        'window_size': getattr(args, 'mass_window_size', 200),
+                        'p_threshold': getattr(args, 'mass_p_threshold', 0.1),
+                        'similarity_threshold': getattr(args, 'mass_similarity_threshold', 0.01),
+                        'expansion_patience': getattr(args, 'mass_expansion_patience', 3),
+                    }
                 )
-
+            
             if args.add_expert_size == 0:
                 assert layer_module.mlp.experts.batched_fc1_w.data.shape == expert_w0.shape, f"{layer_module.mlp.experts.batched_fc1_w.data.shape} != {expert_w0.shape}"
                 assert layer_module.mlp.experts.batched_fc1_bias.data.shape == bias_0.shape,  f"{layer_module.mlp.experts.htoh4.bias.data.shape} != {bias_0.shape}"
