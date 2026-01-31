@@ -2,7 +2,7 @@
 
 This repository contains the implementation of **MASS (Mixture-of-Experts for Adaptive Semantic Specialization)**, a novel approach that combines Mixture of Experts (MoE) with adaptive expert expansion for both **Language** and **Vision** tasks. MASS dynamically adjusts the number of experts based on gradient dynamics, enabling efficient domain generalization and specialization.
 
-## 🚀 Key Features
+## Key Features
 
 - **Adaptive Expert Expansion**: Dynamically expands experts during training based on gradient-driven semantic drift signals
 - **MinTau Routing**: Novel adaptive gate mechanism that selects experts based on cumulative routing mass
@@ -34,7 +34,7 @@ This repository contains the implementation of **MASS (Mixture-of-Experts for Ad
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 ### Prerequisites
 - Python 3.8+
