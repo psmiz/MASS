@@ -2,7 +2,7 @@
 set -x
 source consts.sh
 
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=5
 
 MOE_LAYERS_LIST=("10")
 TASK_NAME=cola
@@ -11,7 +11,7 @@ NUM_EXPERTS_LIST=(8)
 REPEAT=16
 SEEDS="0 1 2"
 LR="2e-5"
-GATE=mintau
+GATE=mass
 
 for MOE_LAYERS in ${MOE_LAYERS_LIST[@]}; do
     MOE_LAYERS_NAME=$MOE_LAYERS

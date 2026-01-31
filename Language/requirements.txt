@@ -1,6 +1,9 @@
 k_means_constrained
 peft
 transformers==4.31.0
-datasets
+pyarrow==10.0.1
+datasets==2.14.0
 evaluate
-accelerate
+huggingface_hub==0.14.1
+accelerate==0.20.3
+numpy==1.24.3

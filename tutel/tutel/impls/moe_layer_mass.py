@@ -25,7 +25,6 @@ class MoELayerMASS(MOELayer):
         self.expansion_patience = self.mass_config.get('expansion_patience', 3)
         self.enable_mass = self.mass_config.get('enable_mass', True)
 
-        # MASS tracking state
         self.stop_expansion = False
         self.duplicated_pairs = []
         self.expansion_count = 0
@@ -46,7 +45,6 @@ class MoELayerMASS(MOELayer):
         self.grad_window = [deque(maxlen=self.window_size) for _ in range(self.num_global_experts)]
         self.z_window = [deque(maxlen=self.window_size) for _ in range(self.num_global_experts)]
         
-        # Hook storage
         self._grad_hooks = []
         
     def _register_gradient_hooks(self):
@@ -77,7 +75,7 @@ class MoELayerMASS(MOELayer):
         self._grad_hooks.clear()
         
     def _reset_mass_statistics(self, expert_idx):
-        """Reset MASS statistics for a specific expert"""
+        """Reset MASS statistics"""
         self.grad_count[expert_idx] = 0
 
     def _remove_expert(self):

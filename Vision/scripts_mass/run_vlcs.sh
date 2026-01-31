@@ -1,19 +1,19 @@
 #!/bin/bash
 set -x
 source consts.sh
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=1
 
 DEVICE=0
 SEEDS=(0)
-ENVS=(0 1 2 3)
+ENVS=(0)
 OUTPUT_DIR=outputs
 
 mkdir -p $OUTPUT_DIR/logs
 
 for SEED in "${SEEDS[@]}"; do
     for ENV in "${ENVS[@]}"; do
-        python3 -m domainbed.scripts.train_mass \
-            --data_dir=/domainbed/data \
+        nohup python3 -m domainbed.scripts.train_mass \
+            --data_dir=/mnt/data0/psm/NIPS_2025/dynmoe/EMoE/Vision/domainbed/data \
             --dataset VLCS \
             --seed $SEED \
             --test_envs $ENV \
@@ -24,8 +24,8 @@ for SEED in "${SEEDS[@]}"; do
             --device $DEVICE \
             --enable_mass \
             --mass_p_threshold 0.01 \
-            --mass_similarity_threshold 0.001 \
+            --mass_similarity_threshold 0.002 \
             --mass_expansion_patience 3 \
-            --mass_redundancy_weight 0.01
+            --mass_redundancy_weight 0.01 > $OUTPUT_DIR/logs/vlcs_mass_${ENV}.log 2>&1 &
     done
 done

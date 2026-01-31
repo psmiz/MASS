@@ -5,7 +5,7 @@ export CUDA_VISIBLE_DEVICES=0
 
 DEVICE=0
 SEEDS=(0)
-ENVS=(0 1 2 3)
+ENVS=(0)
 OUTPUT_DIR=outputs
 
 mkdir -p $OUTPUT_DIR/logs
@@ -13,7 +13,7 @@ mkdir -p $OUTPUT_DIR/logs
 for SEED in "${SEEDS[@]}"; do
     for ENV in "${ENVS[@]}"; do
         nohup python3 -m domainbed.scripts.train_mass \
-            --data_dir=/domainbed/data \
+            --data_dir=/mnt/data0/psm/NIPS_2025/dynmoe/EMoE/Vision/domainbed/data \
             --dataset PACS \
             --seed $SEED \
             --test_envs $ENV \
@@ -24,7 +24,7 @@ for SEED in "${SEEDS[@]}"; do
             --device $DEVICE \
             --enable_mass \
             --mass_p_threshold 0.01 \
-            --mass_similarity_threshold 0.001 \
+            --mass_similarity_threshold 0.002 \
             --mass_expansion_patience 3 \
             --mass_redundancy_weight 0.01 > $OUTPUT_DIR/logs/pacs_seed${SEED}_env${ENV}.log 2>&1 &
     done

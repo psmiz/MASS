@@ -253,7 +253,7 @@ def parse_args():
     
     # Expert expansion timing arguments
     parser.add_argument('--expansion_start_ratio', type=float, default=0.0, help='Start expansion at this ratio of total training steps (default: 0.0 = start immediately)')
-    parser.add_argument('--expansion_end_ratio', type=float, default=0.1, help='End expansion at this ratio of total training steps (default: 0.1 = 10% of training)')
+    parser.add_argument('--expansion_end_ratio', type=float, default=0.1, help='End expansion at this ratio of total training steps (default: 0.1 = 10%% of training)')
     
     args = parser.parse_args()
 

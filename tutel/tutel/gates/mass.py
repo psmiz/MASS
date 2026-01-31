@@ -4,7 +4,7 @@
 import torch
 import torch.nn.functional as F
 
-class MinTauGate(torch.nn.Module):
+class MASSGate(torch.nn.Module):
     """
     MASS-enabled Adaptive Gate with expert mask and dynamic expansion capabilities.
     Implements adaptive selection based on cumulative routing mass threshold.
@@ -38,7 +38,7 @@ class MinTauGate(torch.nn.Module):
         self.capacity_factor = 0.0 
         self.adaptive_top_k = True
         
-        print(f"MinTau Adaptive Gate initialized: {num_global_experts} initial experts, max {self.max_expert_num}, threshold {self.threshold}")
+        print(f"MASS Adaptive Gate initialized: {num_global_experts} initial experts, max {self.max_expert_num}, threshold {self.threshold}")
 
     def forward(self, x):
         if self.fp32_gate:
@@ -51,7 +51,6 @@ class MinTauGate(torch.nn.Module):
         scores = scores.masked_fill(self.experts_mask.unsqueeze(0) == 0, -1e9)
         scores = F.softmax(scores, dim=-1, dtype=torch.float32) + 1e-14
 
-        # Adaptive selection based on cumulative routing mass
         sorted_scores, _ = scores.sort(dim=-1, descending=True)
         cum_scores = sorted_scores.cumsum(dim=-1)
         mask = (cum_scores - sorted_scores) < self.threshold
@@ -67,4 +66,4 @@ class MinTauGate(torch.nn.Module):
         # print('Average Top K is {}, max is {}'.format(sum(top_k) / len(top_k), max(top_k)))
         return scores.type_as(x), top_k
 
-Gate = MinTauGate
+Gate = MASSGate
