@@ -145,4 +145,20 @@ python3 -m domainbed.scripts.collect_results --input_dir=${output_dir}
 
 ---
 
-<!-- **Happy experimenting with MASS! 🚀**  -->
+## Citation
+
+```bibtex
+@misc{park2025expertsenoughoptimalsemantic,
+      title={How Many Experts Are Enough? Towards Optimal Semantic Specialization for Mixture-of-Experts}, 
+      author={Sumin Park and Noseong Park},
+      year={2025},
+      eprint={2512.19765},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2512.19765}, 
+}
+```
+
+---
+
+<!-- **Happy experimenting with MASS!**  -->
