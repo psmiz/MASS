@@ -1,4 +1,4 @@
-# MASS: Mixture-of-Experts for Adaptive Semantic Specialization
+# How Many Experts Are Enough? Towards Optimal Semantic Specialization for Mixture-of-Experts (AAAI 2026)
 
 This repository contains the implementation of **MASS (Mixture-of-Experts for Adaptive Semantic Specialization)**, a novel approach that combines Mixture of Experts (MoE) with adaptive expert expansion for both **Language** and **Vision** tasks. MASS dynamically adjusts the number of experts based on gradient dynamics, enabling efficient domain generalization and specialization.
 
